@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """MCMC Retrieval Setup Template"""
 import os 
+import sys
+sys.path.append("/home/users/odonovb3/brewster_v2")
 import utils
 import numpy as np
 import retrieval_run
@@ -46,15 +48,17 @@ re_params = utils.Retrieval_params(samplemode,chemeq,gaslist,gastype_list,do_fud
 model_config_instance = utils.ModelConfig(samplemode,do_fudge,cloudpath=cloudpath)
 io_config_instance = utils.IOConfig()
 
-
-io_config_instance.outdir="/beegfs/car/fei/lsr1835/test/"
-io_config_instance.runname='V2_G570D_test'
+# Dont make runargs file
+io_config_instance.make_arg_pickle=0
+io_config_instance.outdir="/home/users/odonovb3/brewster_v2/G570D/"
+io_config_instance.runname='V2_G570D_test_new'
 io_config_instance.update_dictionary()
 
-
+#Continue run
+model_config_instance.fresh = 1
 model_config_instance.dist= 5.84
 model_config_instance.xlist ='data/gaslistRox.dat'
-model_config_instance.xpath ='../Linelists/'
+model_config_instance.xpath ='/home/projects/pi-johvos/Linelists/'
 model_config_instance.do_bff=0
 model_config_instance.niter=30000
 model_config_instance.update_dictionary()

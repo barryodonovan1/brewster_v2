@@ -136,7 +136,7 @@ def set_prof(proftype, coarsePress,press,intemp):
         # then smooth with 5 layer box car 
         temp1 = convolve(temp,Gaussian1DKernel(5),boundary='extend')
  
-    elif (proftype == 7 or proftype == 77):
+    elif (proftype == 7 or proftype == 77 or proftype == 777):
         # this is Molliere's hybrid profile, hacked by Michelle Colantoni from
         # petitRadTran. But, using dry adiabat for H2/He atmosphere
         # a few variable names changed by BB, and a bit of restructuring

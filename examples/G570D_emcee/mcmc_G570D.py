@@ -42,9 +42,12 @@ particle_dis=['None']
 do_fudge=1
 samplemode='mcmc'
 # samplemode='multinest'
-
 instrument_instance = utils.Instrument(wavelength_range=wavelength_range, R_file=Rfile,obspec=obspec)
-re_params = utils.Retrieval_params(samplemode,chemeq,gaslist,gastype_list,do_fudge,ptype,do_clouds,npatches,cloud_name,cloudpatch_index,particle_dis,instrument=instrument_instance)
+re_params = utils.Retrieval_params(samplemode=samplemode, chemeq=chemeq, gaslist=gaslist,
+    gastype_list=gastype_list,do_fudge=do_fudge, ptype=ptype, do_clouds=do_clouds,
+    npatches=npatches, cloud_name=cloud_name, cloud_type=cloud_type,
+    cloudpatch_index=cloudpatch_index, particle_dis=particle_dis,
+    instrument=instrument_instance,fwhm=None)
 model_config_instance = utils.ModelConfig(samplemode,do_fudge,cloudpath=cloudpath)
 io_config_instance = utils.IOConfig()
 

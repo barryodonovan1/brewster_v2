@@ -706,7 +706,7 @@ class Retrieval_params:
                             'prior':None}
                          }}
 
-        elif ptype==7 :
+        elif (ptype == 7 or ptype == 777) :
 
             dictionary={
                 'ptype':ptype,
@@ -1177,10 +1177,10 @@ class Retrieval_params:
             
         # Remove 'scale1' and 'scale2' if fwhm condition is not met
 
-        if self.fwhm is None:
+        if self.fwhm is None or self.fwhm == 555:
             ndata=int(np.max(self.instrument.logf_flag))
     
-        if self.fwhm is not None:
+        if self.fwhm is not None and self.fwhm != 555:
             if self.do_fudge==1:
                 ndata=1
             else:

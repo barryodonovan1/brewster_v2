@@ -813,6 +813,59 @@ class Priors:
                 T = TPmod.set_prof(self.args_instance.proftype, self.args_instance.coarsePress,self.args_instance.press, self.intemp)
                 prior_T_overall = (min(T) > 1.0) and (max(T) < 6000.)
 
+        elif self.args_instance.proftype==777:
+
+            """
+            delta=np.exp(lndelta)
+            tau=delta*(press)**alpha
+
+            delta=tau/(press)**alpha, alpha in [1,2]
+
+            find prior range of delta to keep τ ≈ 1 in a physically sensible region (typically around 0.1 -- 10 bar).
+
+            1. tau=1, alpha=1:
+
+            delta=1/press, press in [0.1, 10]
+            delta in [0.1,10]
+
+            2. tau=1, alpha=2:
+
+            delta=1/press**2, press in [0.1, 10]
+            delta in [0.01,100]
+            """
+
+            delta=np.exp(self.params_instance.lndelta)
+            T = np.empty([self.args_instance.press.size])
+            T[:] = -100.
+            Tconnect = (((3/4) * self.params_instance.Tint**4) * ((2/3) + (0.1)))**(1/4)
+
+            P1 = ((1/delta)**(1/self.params_instance.alpha)) # P1 - pressure where tau = 1
+            cp = 0.84*14.32 + 0.16*5.19
+            cv = 0.84*10.16 + 0.16*3.12
+            gamma=cp/cv
+
+            tau=delta*(self.args_instance.press)**self.params_instance.alpha
+            T_edd=(((3/4)*self.params_instance.Tint**4)*((2/3)+(tau)))**(1/4)
+            nabla_ad=(gamma-1)/gamma
+            nabla_rad = np.diff(np.log(T_edd))/np.diff(np.log(self.args_instance.press))
+            convtest = np.any(np.where(nabla_rad >= nabla_ad))
+            # Now get temperatures on the adiabat from RC boundary downwards
+            if convtest:
+                RCbound = np.where(nabla_rad >= nabla_ad)[0][0]
+                P_RC = self.args_instance.press[RCbound]
+            else:
+                P_RC = 1000.
+
+            #doesnt allow inversion
+            prior_T_params= (1 < self.params_instance.alpha  < 2. and P_RC < 100 and P1 < P_RC
+                and P_RC > self.args_instance.press[0] and  P1 > self.args_instance.press[0]
+                and self.params_instance.T1 > 0.0 and self.params_instance.T2 > self.params_instance.T1 and self.params_instance.T3 > self.params_instance.T2 and Tconnect > self.params_instance.T3 and self.params_instance.Tint >0.0 and 0.01 <= delta <= 100)
+            
+            prior_T_overall=False
+            if prior_T_params==True:
+                T = TPmod.set_prof(self.args_instance.proftype, self.args_instance.coarsePress,self.args_instance.press, self.intemp)
+                prior_T_overall = (min(T) > 1.0) and (max(T) < 6000.)
+
         elif self.args_instance.proftype==77:
             """
             delta=np.exp(lndelta)

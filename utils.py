@@ -552,57 +552,57 @@ class Retrieval_params:
         
         
         
-def gas_dic_gen(self, gasname, gastype):
-
-    dictionary = {}
-    if gastype == 'U':
-        dictionary[gasname] = {
-            'gastype': gastype,
-            'params': {'log_abund':
-                        {'initialization': None,
-                         'MC_init_dis': ['normal', -4.0, 0.5],
-                         'MC_prior_range': [-12, 0],
-                         'Multinest_prior': ['centered_log_abund', -12]}
-                      }}
-    elif gastype == 'N':
-        dictionary[gasname] = {
-            'gastype': gastype,
-            'params': {'log_abund':
-                        {'initialization': None,
-                         'MC_init_dis': ['normal', -4.0, 0.5],
-                         'MC_prior_range': [-12, 0],
-                         'Multinest_prior': ['centered_log_abund', -12]},
-                       "p_ref":
-                        {'initialization': None,
-                         'MC_init_dis': ['normal', -1, 0.2],
-                         'MC_prior_range': [-4, 2.4],
-                         'Multinest_prior': None
-                        },
-                       "alpha":
-                        {'initialization': None,
-                         'MC_init_dis': ['uniform', 0, 1],
-                         'MC_prior_range': [-5, 5],
-                         'Multinest_prior': ['uniform', -5, 5]}
-                       }}
-    elif gastype == 'S':
-        dictionary[gasname] = {
-            'gastype': gastype,
-            'params': {'log_abund':
-                        {'initialization': None,
-                         'MC_init_dis': ['normal', -4.0, 0.5],
-                         'MC_prior_range': [-12, 0],
-                         'Multinest_prior': ['centered_log_abund', -12]},
-                       "p_ref":
-                        {'initialization': None,
-                         'MC_init_dis': ['normal', -1, 0.2],
-                         'MC_prior_range': [-4, 2.4],
-                         'Multinest_prior': None
-                        },
-                       "upper":
-                        {'initialization': None,
-                         'MC_init_dis': ['normal', -5.0, 0.5],
-                         'MC_prior_range': [-12, 0],
-                         'Multinest_prior': ['centered_log_abund', -12]}
+    def gas_dic_gen(self, gasname, gastype):
+    
+        dictionary = {}
+        if gastype == 'U':
+            dictionary[gasname] = {
+                'gastype': gastype,
+                'params': {'log_abund':
+                            {'initialization': None,
+                             'MC_init_dis': ['normal', -4.0, 0.5],
+                             'MC_prior_range': [-12, 0],
+                             'Multinest_prior': ['centered_log_abund', -12]}
+                          }}
+        elif gastype == 'N':
+            dictionary[gasname] = {
+                'gastype': gastype,
+                'params': {'log_abund':
+                            {'initialization': None,
+                             'MC_init_dis': ['normal', -4.0, 0.5],
+                             'MC_prior_range': [-12, 0],
+                             'Multinest_prior': ['centered_log_abund', -12]},
+                           "p_ref":
+                            {'initialization': None,
+                             'MC_init_dis': ['normal', -1, 0.2],
+                             'MC_prior_range': [-4, 2.4],
+                             'Multinest_prior': None
+                            },
+                           "alpha":
+                            {'initialization': None,
+                             'MC_init_dis': ['uniform', 0, 1],
+                             'MC_prior_range': [-5, 5],
+                             'Multinest_prior': ['uniform', -5, 5]}
+                           }}
+        elif gastype == 'S':
+            dictionary[gasname] = {
+                'gastype': gastype,
+                'params': {'log_abund':
+                            {'initialization': None,
+                             'MC_init_dis': ['normal', -4.0, 0.5],
+                             'MC_prior_range': [-12, 0],
+                             'Multinest_prior': ['centered_log_abund', -12]},
+                           "p_ref":
+                            {'initialization': None,
+                             'MC_init_dis': ['normal', -1, 0.2],
+                             'MC_prior_range': [-4, 2.4],
+                             'Multinest_prior': None
+                            },
+                           "upper":
+                            {'initialization': None,
+                             'MC_init_dis': ['normal', -5.0, 0.5],
+                             'MC_prior_range': [-12, 0],
+                             'Multinest_prior': ['centered_log_abund', -12]}
                        }}
         # elif gastype=='H':
         #     dictionary[gasname]={

@@ -135,6 +135,43 @@ def set_prof(proftype, coarsePress,press,intemp):
 
         # then smooth with 5 layer box car 
         temp1 = convolve(temp,Gaussian1DKernel(5),boundary='extend')
+
+    elif (proftype == 4):
+        #Start building Zhang+2023
+
+        #Pressure layers dependent on the paper: 6 layers between 10^-3 to 10^3, evenly space in log scale
+        layer_pressures = np.logspace(-3,3,6)
+
+        #
+        press_zhang = press[np.where(press >= 1e-3)]
+        temp_zhang = np.empty_like(press_zhang)
+
+        #Set up parameters from bottom to top
+        T1 = intemp[0]
+        dtdp = intemp[1:]
+
+        #Quadratic interpolation between 6 layers
+        # Create interp function based on priors for each of the 6 points
+        interp_func = interpolate.interp1d(layer_pressures, dtdp,'quadratic')
+        #Interpolate this onto the finer grid
+        #org top to bottom
+        dtdp_fine = interp_func(press_zhang)
+
+        temp_zhang[-1] = T1
+        #bottom to top aka end to beginning of array
+        for j in range(1,press_zhang.size):
+            temp_zhang[-1-j] = np.exp(np.log(temp_zhang[-j])+ (np.log(press_zhang[-1-j])-np.log(press_zhang[-j]))*dtdp_fine[j])
+
+        #assume isothermal for p < 1e-3
+        temp[np.where(press >= 1e-3)] = np.copy(temp_zhang)
+        temp[np.where(press < 1e-3)] = temp_zhang[0]
+
+
+        # then smooth with 5 layer box car 
+        temp1 = convolve(temp,Gaussian1DKernel(5),boundary='extend')
+        # temp1 = temp
+
+
  
     elif (proftype == 7 or proftype == 77 or proftype == 777):
         # this is Molliere's hybrid profile, hacked by Michelle Colantoni from

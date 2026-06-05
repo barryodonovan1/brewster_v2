@@ -552,43 +552,58 @@ class Retrieval_params:
         
         
         
-    def gas_dic_gen(self,gasname,gastype):
-        
-        dictionary = {}
-        if gastype=='U':
+def gas_dic_gen(self, gasname, gastype):
 
-            dictionary[gasname]={
-                'gastype':gastype,
-                'params':{'log_abund':
-                           {'initialization':None,
-                            'MC_init_dis':['normal',-4.0,0.5],
-                            'MC_prior_range':[-12,0],
-                            'Multinest_prior':['centered_log_abund',-12]}
-                         }}
-
-        elif gastype=='N':
-
-            dictionary[gasname]={
-                'gastype':gastype,
-                'params':{'log_abund':
-                           {'initialization':None,
-                            'MC_init_dis':['normal',-4.0,0.5],
-                            'MC_prior_range':[-12,0],
-                            'Multinest_prior':['centered_log_abund',-12]},
-
-                           "p_ref": 
-                            {'initialization':None,
-                             'MC_init_dis':['normal',-1,0.2],
-                             'MC_prior_range':[-4,2.4],
-                             'Multinest_prior':None
-                            },
-
-                           "alpha":
-                            {'initialization':None,
-                             'MC_init_dis':['uniform',0,1],
-                             'MC_prior_range':[-5,5],
-                             'Multinest_prior':['uniform',-5,5]}    
-                           }}
+    dictionary = {}
+    if gastype == 'U':
+        dictionary[gasname] = {
+            'gastype': gastype,
+            'params': {'log_abund':
+                        {'initialization': None,
+                         'MC_init_dis': ['normal', -4.0, 0.5],
+                         'MC_prior_range': [-12, 0],
+                         'Multinest_prior': ['centered_log_abund', -12]}
+                      }}
+    elif gastype == 'N':
+        dictionary[gasname] = {
+            'gastype': gastype,
+            'params': {'log_abund':
+                        {'initialization': None,
+                         'MC_init_dis': ['normal', -4.0, 0.5],
+                         'MC_prior_range': [-12, 0],
+                         'Multinest_prior': ['centered_log_abund', -12]},
+                       "p_ref":
+                        {'initialization': None,
+                         'MC_init_dis': ['normal', -1, 0.2],
+                         'MC_prior_range': [-4, 2.4],
+                         'Multinest_prior': None
+                        },
+                       "alpha":
+                        {'initialization': None,
+                         'MC_init_dis': ['uniform', 0, 1],
+                         'MC_prior_range': [-5, 5],
+                         'Multinest_prior': ['uniform', -5, 5]}
+                       }}
+    elif gastype == 'S':
+        dictionary[gasname] = {
+            'gastype': gastype,
+            'params': {'log_abund':
+                        {'initialization': None,
+                         'MC_init_dis': ['normal', -4.0, 0.5],
+                         'MC_prior_range': [-12, 0],
+                         'Multinest_prior': ['centered_log_abund', -12]},
+                       "p_ref":
+                        {'initialization': None,
+                         'MC_init_dis': ['normal', -1, 0.2],
+                         'MC_prior_range': [-4, 2.4],
+                         'Multinest_prior': None
+                        },
+                       "upper":
+                        {'initialization': None,
+                         'MC_init_dis': ['normal', -5.0, 0.5],
+                         'MC_prior_range': [-12, 0],
+                         'Multinest_prior': ['centered_log_abund', -12]}
+                       }}
         # elif gastype=='H':
         #     dictionary[gasname]={
         #         'gastype':gastype,
@@ -1498,14 +1513,18 @@ def get_all_parametres(dic):
         for i in range(len(gaslist)):
             gas.append(gaslist[i])
             gas_values.append(dic['gas'][gaslist[i]]['params']['log_abund']['initialization'])
-            if  gastype_values[i]=='N':
-                gas.append("p_ref_%s"%gaslist[i])
-                gas.append("alpha_%s"%gaslist[i])
+            if gastype_values[i] == 'N':
+                gas.append("p_ref_%s" % gaslist[i])
+                gas.append("alpha_%s" % gaslist[i])
                 gas_values.append(dic['gas'][gaslist[i]]['params']['p_ref']['initialization'])
-                gas_values.append(dic['gas'][gaslist[i]]['params']['alpha']['initialization'])    
-
-            elif gastype_values[i]=='H':
-                gas.append("p_ref_%s"%gaslist[i])
+                gas_values.append(dic['gas'][gaslist[i]]['params']['alpha']['initialization'])
+            elif gastype_values[i] == 'S':
+                gas.append("p_ref_%s" % gaslist[i])
+                gas.append("upper_%s" % gaslist[i])
+                gas_values.append(dic['gas'][gaslist[i]]['params']['p_ref']['initialization'])
+                gas_values.append(dic['gas'][gaslist[i]]['params']['upper']['initialization'])
+            elif gastype_values[i] == 'H':
+                gas.append("p_ref_%s" % gaslist[i])
                 gas_values.append(dic['gas'][gaslist[i]]['params']['p_ref']['initialization'])
         
             
@@ -1602,15 +1621,17 @@ def update_dictionary(dic, params_instance):
     # Update gas parameters
     # -------------------------------
     gastype_values = [info['gastype'] for key, info in dic['gas'].items() if 'gastype' in info]
-    gaslist=list(dic['gas'].keys())
+    gaslist = list(dic['gas'].keys())
     for i in range(len(gaslist)):
         dic['gas'][gaslist[i]]['params']['log_abund']['initialization'] = getattr(params_instance, gaslist[i])
-        if gastype_values[i]=='N':
-            dic['gas'][gaslist[i]]['params']['p_ref']['initialization'] = getattr(params_instance, "p_ref_%s"%gaslist[i])
-            dic['gas'][gaslist[i]]['params']['alpha']['initialization'] = getattr(params_instance, "alpha_%s"%gaslist[i])
-
-        if gastype_values[i]=='H':
-            dic['gas'][gaslist[i]]['params']['p_ref']['initialization'] = getattr(params_instance, "p_ref_%s"%gaslist[i])
+        if gastype_values[i] == 'N':
+            dic['gas'][gaslist[i]]['params']['p_ref']['initialization'] = getattr(params_instance, "p_ref_%s" % gaslist[i])
+            dic['gas'][gaslist[i]]['params']['alpha']['initialization'] = getattr(params_instance, "alpha_%s" % gaslist[i])
+        elif gastype_values[i] == 'S':
+            dic['gas'][gaslist[i]]['params']['p_ref']['initialization'] = getattr(params_instance, "p_ref_%s" % gaslist[i])
+            dic['gas'][gaslist[i]]['params']['upper']['initialization'] = getattr(params_instance, "upper_%s" % gaslist[i])
+        elif gastype_values[i] == 'H':
+            dic['gas'][gaslist[i]]['params']['p_ref']['initialization'] = getattr(params_instance, "p_ref_%s" % gaslist[i])
 
     # -------------------------------
     # Update refinement parameters

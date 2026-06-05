@@ -392,25 +392,27 @@ def modelspec(theta,re_params,args_instance,gnostics):
         gastype_values = [info['gastype'] for key, info in re_params.dictionary['gas'].items() if 'gastype' in info]
             
         for i in range(len(gastype_values)):
-            if  gastype_values[i]=="N":
-                P_gas= getattr(params_instance, "p_ref_%s"%gas_keys[i])
-                gas_alpha= getattr(params_instance, "alpha_%s"%gas_keys[i])
-                t_gas= getattr(params_instance, gas_keys[i])
-                gas_profile=gas_nonuniform.non_uniform_gas(press,P_gas,t_gas,gas_alpha)
-                logVMR[i]=gas_profile
-
-            elif gastype_values[i]=="H":
-
-                p_gas= getattr(params_instance, "p_ref_%s"%gas_keys[i])
+            if gastype_values[i] == "N":
+                P_gas = getattr(params_instance, "p_ref_%s" % gas_keys[i])
+                gas_alpha = getattr(params_instance, "alpha_%s" % gas_keys[i])
+                t_gas = getattr(params_instance, gas_keys[i])
+                gas_profile = gas_nonuniform.non_uniform_gas(press, P_gas, t_gas, gas_alpha)
+                logVMR[i] = gas_profile
+            elif gastype_values[i] == "S":
+                P_gas = getattr(params_instance, "p_ref_%s" % gas_keys[i])
+                logf_deep = getattr(params_instance, gas_keys[i])
+                logf_upper = getattr(params_instance, "upper_%s" % gas_keys[i])
+                gas_profile = gas_nonuniform_stepfunc.non_uniform_gas(press, P_gas, logf_deep, logf_upper)
+                logVMR[i] = gas_profile
+            elif gastype_values[i] == "H":
+                p_gas = getattr(params_instance, "p_ref_%s" % gas_keys[i])
                 P_gas = 10**p_gas
-
-                if np.size(np.where((press>=P_gas))[0])==0:   #may return null array
-                    p_gas_index=np.size(press)-1
+                if np.size(np.where((press >= P_gas))[0]) == 0:
+                    p_gas_index = np.size(press) - 1
                 else:
-                    p_gas_index=np.where((press>=P_gas))[0][0] 
-
-                logVMR[i,0:p_gas_index]=tmpvmr[i]
-                logVMR[i,p_gas_index:]=-100
+                    p_gas_index = np.where((press >= P_gas))[0][0]
+                logVMR[i, 0:p_gas_index] = tmpvmr[i]
+                logVMR[i, p_gas_index:] = -100
 
     # ---- Cloud profiles ----
     # now need to translate cloudparams in to cloud profile even

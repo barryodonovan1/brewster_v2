@@ -4,6 +4,7 @@
 from __future__ import print_function
 import TPmod
 import gas_nonuniform
+import gas_nonuniform_stepfunc
 from collections import namedtuple
 import utils
 import settings
@@ -350,6 +351,7 @@ class Priors:
         ]
 
         self.count_N = self.gastype_values.count('N')
+        self.count_S = self.gastype_values.count('S')
 
         if self.samplemode == 'mcmc':
 
@@ -940,21 +942,29 @@ class Priors:
             invmr = np.array([getattr(self.params_instance, key) for key in gas_keys])
             prior_gas = (np.sum(10.**invmr) < 1.0)
 
-            if self.count_N > 0:
-                gas_profile = np.full((self.count_N, self.args_instance.press.size), -1.0)
-                gas_profile_index = 0
-                for i, gastype in enumerate(self.gastype_values):
-                    if gastype == "N":
-                        P_gas = getattr(self.params_instance, f"p_ref_{gas_keys[i]}")
-                        gas_alpha = getattr(self.params_instance, f"alpha_{gas_keys[i]}")
-                        t_gas = getattr(self.params_instance, gas_keys[i])
-
-                        if (np.log10(self.args_instance.press[0]) <= P_gas <= np.log10(self.args_instance.press[-1])):
-                            gas_profile[gas_profile_index, :] = gas_nonuniform.non_uniform_gas(self.args_instance.press, P_gas, t_gas, gas_alpha)
-                        else:
-                            gas_profile[gas_profile_index, :] = -30
-                        gas_profile_index += 1
-                prior_gas = prior_gas and (np.all(gas_profile > -25.0) and np.all(gas_profile < 0.0))
+        if self.count_N > 0 or self.count_S > 0:
+            gas_profile = np.full((self.count_N + self.count_S, self.args_instance.press.size), -1.0)
+            gas_profile_index = 0
+            for i, gastype in enumerate(self.gastype_values):
+                if gastype == "N":
+                    P_gas = getattr(self.params_instance, f"p_ref_{gas_keys[i]}")
+                    gas_alpha = getattr(self.params_instance, f"alpha_{gas_keys[i]}")
+                    t_gas = getattr(self.params_instance, gas_keys[i])
+                    if (np.log10(self.args_instance.press[0]) <= P_gas <= np.log10(self.args_instance.press[-1])):
+                        gas_profile[gas_profile_index, :] = gas_nonuniform.non_uniform_gas(self.args_instance.press, P_gas, t_gas, gas_alpha)
+                    else:
+                        gas_profile[gas_profile_index, :] = -30
+                    gas_profile_index += 1
+                elif gastype == "S":
+                    P_gas = getattr(self.params_instance, f"p_ref_{gas_keys[i]}")
+                    logf_deep = getattr(self.params_instance, gas_keys[i])
+                    logf_upper = getattr(self.params_instance, f"upper_{gas_keys[i]}")
+                    if (np.log10(self.args_instance.press[0]) <= P_gas <= np.log10(self.args_instance.press[-1])):
+                        gas_profile[gas_profile_index, :] = gas_nonuniform_stepfunc.non_uniform_gas(self.args_instance.press, P_gas, logf_deep, logf_upper)
+                    else:
+                        gas_profile[gas_profile_index, :] = -30
+                    gas_profile_index += 1
+            prior_gas = prior_gas and (np.all(gas_profile > -25.0) and np.all(gas_profile < 0.0))
 
         # 3. Mass and Radius check
         D = 3.086e+16 * self.args_instance.dist  # Distance in meters

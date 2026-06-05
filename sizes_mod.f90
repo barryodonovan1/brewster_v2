@@ -33,7 +33,7 @@ module sizes
 
   
   ! max wave number
-  integer, parameter :: maxwave = 40000
+  integer, parameter :: maxwave = 100000
 
   ! max number of patches
   integer, parameter :: maxpatch = 4

@@ -128,6 +128,7 @@ def lnlike(theta,re_params):
     do_fudge=args_instance.do_fudge
     do_shift=args_instance.do_shift
     do_scales=args_instance.do_scales
+    do_conv=args_instance.do_conv
 
     # ---- Generate the forward model spectrum ----
     # for MCMC runs we don't want diagnostics
@@ -137,7 +138,7 @@ def lnlike(theta,re_params):
     lnLik = 0.0
 
     # Process the model spectrum into observed space (scaling, shifting, etc.)
-    wave,outspec=proc_spec(inputspec=trimspec, theta=params_instance, re_params=re_params, args_instance=args_instance, do_scales=do_scales, do_shift=do_shift)
+    wave,outspec=proc_spec(inputspec=trimspec, theta=params_instance, re_params=re_params, args_instance=args_instance, do_scales=do_scales, do_shift=do_shift,do_conv=do_conv)
 
     # ---- Case 1: Uniform spectral resolution (FWHM) ----
     if args_instance.fwhm is not None:
@@ -330,7 +331,7 @@ def modelspec(theta,re_params,args_instance,gnostics):
     elif (proftype == 77):
         gam = params_instance.gamma
         intemp=intemp[1:]
-    elif (proftype == 2 or proftype ==3 or proftype ==7 or proftype ==777):
+    elif (proftype == 2 or proftype ==3 or proftype ==7 or proftype ==777 or proftype ==4):
         intemp=intemp
     elif (proftype == 9):
         intemp = args_instance.prof

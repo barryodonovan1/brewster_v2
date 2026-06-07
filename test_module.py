@@ -29,6 +29,7 @@ from collections import namedtuple
 import utils
 import settings
 import gas_nonuniform
+import gas_nonuniform_stepfunc
 import Priors
 from rotBroadInt import rot_int_cmj as rotBroad
 from specops import proc_spec

@@ -1772,6 +1772,13 @@ def get_dis_range_priors(dic):
                 mc_init_dis[key] = params['alpha'].get('MC_init_dis')
                 multinest_priors[key] = params['alpha'].get('Multinest_prior')
 
+            # upper (step function non-uniform)
+            if 'upper' in params:
+                key = f"upper_{gas}"
+                mc_ranges[key] = params['upper'].get('MC_prior_range')
+                mc_init_dis[key] = params['upper'].get('MC_init_dis')
+                multinest_priors[key] = params['upper'].get('Multinest_prior')
+
     # ---------------------------------
     # Refinement parameters
     # ---------------------------------

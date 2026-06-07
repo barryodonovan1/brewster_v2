@@ -26,6 +26,7 @@ from collections import namedtuple
 import utils
 import settings
 import gas_nonuniform
+import gas_nonuniform_stepfunc
 import test_module
 from specops import proc_spec
 

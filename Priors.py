@@ -959,7 +959,7 @@ class Priors:
                     P_gas = getattr(self.params_instance, f"p_ref_{gas_keys[i]}")
                     logf_deep = getattr(self.params_instance, gas_keys[i])
                     logf_upper = getattr(self.params_instance, f"upper_{gas_keys[i]}")
-                    if (np.log10(self.args_instance.press[0]) <= P_gas <= np.log10(self.args_instance.press[-1])):
+                    if (np.log10(self.args_instance.press[0]) <= P_gas <= np.log10(self.args_instance.press[-1]) and (logf_upper < logf_deep)):
                         gas_profile[gas_profile_index, :] = gas_nonuniform_stepfunc.non_uniform_gas(self.args_instance.press, P_gas, logf_deep, logf_upper)
                     else:
                         gas_profile[gas_profile_index, :] = -30

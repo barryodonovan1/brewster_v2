@@ -634,34 +634,13 @@ class Priors:
                 invgamma = ((beta**alpha)/math.gamma(alpha)) * (gamma**(-alpha-1)) * np.exp(-beta/gamma)
                 prprob =(-0.5/gamma)*np.sum(diff[1:-1]**2) - 0.5*pp*np.log(gamma) + np.log(invgamma)
                 self.priors =prprob + logp
-            elif self.args_instance.proftype in [4]:
-                self.priors = logp + self._zhang_gaussian_logprior()
             else:
                 self.priors =logp
 
         else:
             self.priors = -np.inf
     
-    def _zhang_gaussian_logprior(self):
-        """
-        Optional Gaussian prior on the Zhang+23 (proftype 4) dlnT/dlnP nodes.
 
-        Set per parameter in the run script, e.g.
-            re_params.dictionary['pt']['params']['dTdP1']['MC_prior_dis'] = ['gaussian', 0.157, 0.03]
-        Parameters without MC_prior_dis keep a flat prior. Hard bounds are still
-        MC_prior_range. The normalisation constant is omitted (constant for MCMC).
-        """
-        lp = 0.0
-        for name, info in self.re_params.dictionary['pt']['params'].items():
-            dis = info.get('MC_prior_dis')
-            if dis is None or dis[0] == 'uniform':
-                continue
-            if dis[0] not in ('gaussian', 'normal'):
-                raise ValueError(f"Unknown MC_prior_dis {dis[0]!r} for {name}")
-            mu, sigma = dis[1], dis[2]
-            x = getattr(self.params_instance, name)
-            lp += -0.5 * ((x - mu) / sigma) ** 2
-        return lp
 
     # def _check_param_ranges(self,theta, all_params,ranges):
     #     for param, value in zip(all_params, theta):
@@ -688,7 +667,7 @@ class Priors:
                 continue
 
             # Uniform and normal prior range
-            if init_dis[0] == "uniform" or "normal":
+            if init_dis[0] == "uniform" or init_dis[0] == "normal":
                 if not (r[0] < value < r[1]):
                     return -np.inf
                 logp += 0
@@ -759,13 +738,8 @@ class Priors:
             
         elif self.args_instance.proftype==4:
 
-#            prior_T_params = (2000. < self.params_instance.Tbottom < 10000. and 0.18 < self.params_instance.dTdP1 < 0.32
-#                              and 0.12 < self.params_instance.dTdP2 < 0.36 and 0.12 < self.params_instance.dTdP3 < 0.4
-#                              and 0.08 < self.params_instance.dTdP4 < 0.34 and 0. < self.params_instance.dTdP5 < 0.24
-#                              and -0.1 < self.params_instance.dTdP6 < 0.26)
-
-            # dTdP bounds come from MC_prior_range (checked in _check_param_ranges)
             prior_T_params = (2000. < self.params_instance.Tbottom < 10000.)
+
             prior_T_overall =False
             if prior_T_params==True:
                 T = TPmod.set_prof(self.args_instance.proftype, self.args_instance.coarsePress,self.args_instance.press, self.intemp)
@@ -1150,7 +1124,6 @@ class Priors:
                 f"{param_prior_text}\n"
             )
                 
-
 
 
 
